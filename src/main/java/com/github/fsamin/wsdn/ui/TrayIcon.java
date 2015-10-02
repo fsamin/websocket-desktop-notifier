@@ -24,8 +24,7 @@ public class TrayIcon {
             // load an image
             java.awt.Image image = null;
             try {
-                i
-                        mage = ImageIO.read(TrayIcon.class.getResourceAsStream("/info.png"));
+                image = ImageIO.read(TrayIcon.class.getResourceAsStream("/info.png"));
             } catch (IOException ex) {
                 System.out.println(ex);
             }
