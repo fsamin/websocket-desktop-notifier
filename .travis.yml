@@ -10,7 +10,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_deploy:
-  - gradle build
+  - gradle distZip
   - ls -R
 deploy:
   provider: releases
