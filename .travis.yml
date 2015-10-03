@@ -11,10 +11,13 @@ cache:
 
 before_deploy:
   - gradle build
+  - ls -R
 deploy:
   provider: releases
   api_key: $GITHUB_OAUTH_TOKEN
-  file: "build/distributions/websocket-desktop-notifier-1.0.zip"
+  file:
+   - "README.md"
+   - "build/distributions/websocket-desktop-notifier-1.0.zip"
   skip_cleanup: true
   on:
     tags: true
