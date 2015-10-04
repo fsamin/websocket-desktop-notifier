@@ -8,7 +8,6 @@ import javafx.stage.WindowEvent;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by fsamin on 02/10/15.
@@ -68,14 +67,11 @@ public class TrayIcon {
     }
 
     private static void hide(final Stage stage) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if (SystemTray.isSupported()) {
-                    stage.hide();
-                } else {
-                    System.exit(0);
-                }
+        Platform.runLater(() -> {
+            if (SystemTray.isSupported()) {
+                stage.hide();
+            } else {
+                System.exit(0);
             }
         });
     }

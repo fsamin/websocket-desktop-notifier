@@ -8,7 +8,12 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +26,26 @@ public class SocketHandler {
 
     private final CountDownLatch closeLatch;
 
-    @SuppressWarnings("unused")
-    private Session session;
+    String destUri;
 
-    public SocketHandler() {
+    public SocketHandler(String uri) {
+        this.destUri = "ws://echo.websocket.org";
         this.closeLatch = new CountDownLatch(1);
+
+    }
+
+    public WebSocketClient open() throws Exception {
+        Notifier notifier = Notifier.INSTANCE;
+        WebSocketClient client = new WebSocketClient();
+        URI echoUri = new URI(destUri);
+        ClientUpgradeRequest request = new ClientUpgradeRequest();
+        client.start();
+        client.connect(this, echoUri, request);
+
+        Platform.runLater(() ->
+                notifier.notifySuccess("Connection successfull", "connected to " + echoUri)
+        );
+        return client;
     }
 
     public boolean awaitClose(int duration, TimeUnit unit) throws InterruptedException {
@@ -35,14 +55,17 @@ public class SocketHandler {
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.printf("Connection closed: %d - %s%n", statusCode, reason);
-        this.session = null;
         this.closeLatch.countDown();
+
+        Platform.runLater(() ->
+                Notifier.INSTANCE.notifyInfo("Connection closed", statusCode + " | " + reason)
+        );
+
     }
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
         System.out.printf("Got connect: %s%n", session);
-        this.session = session;
         try {
             Future<Void> fut;
             fut = session.getRemote().sendStringByFuture("Hello");
