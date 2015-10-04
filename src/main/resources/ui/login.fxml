@@ -12,12 +12,15 @@
                     <children>
                         <GridPane>
                             <children>
-                                <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                <TextField fx:id="user" promptText="Use &quot;open&quot; to login" text="open"
+                                <Label text="Domain:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                <TextField fx:id="domain" promptText="Use &quot;open&quot; to login" text="domain"
                                            GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                                <TextField fx:id="password" promptText="Use &quot;sesame&quot; to login" text="sesame"
+                                <TextField fx:id="user" promptText="Use &quot;open&quot; to login" text="open"
                                            GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                <TextField fx:id="password" promptText="Use &quot;sesame&quot; to login" text="sesame"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                             </children>
                             <columnConstraints>
                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0"
@@ -26,6 +29,7 @@
                                                    prefWidth="189.0"/>
                             </columnConstraints>
                             <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                             </rowConstraints>

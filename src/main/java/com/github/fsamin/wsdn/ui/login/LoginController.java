@@ -1,6 +1,7 @@
 package com.github.fsamin.wsdn.ui.login;
 
 
+import com.github.fsamin.wsdn.handler.SocketHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -9,6 +10,9 @@ import javafx.scene.control.TextField;
  * Controls the login screen
  */
 public class LoginController {
+
+    @FXML
+    private TextField domain;
     @FXML
     private TextField user;
     @FXML
@@ -36,6 +40,12 @@ public class LoginController {
      * otherwise, return null.
      */
     private String authorize() {
+        try {
+            SocketHandler.getInstance("").open(new LoginCredential(domain.getText(), user.getText(), password.getText()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return
                 "open".equals(user.getText()) && "sesame".equals(password.getText())
                         ? generateSessionID()

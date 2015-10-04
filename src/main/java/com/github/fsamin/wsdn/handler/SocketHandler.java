@@ -1,6 +1,7 @@
 package com.github.fsamin.wsdn.handler;
 
 import com.github.fsamin.wsdn.ui.Notifier;
+import com.github.fsamin.wsdn.ui.login.LoginCredential;
 import javafx.application.Platform;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
@@ -11,9 +12,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -24,43 +23,42 @@ import java.util.concurrent.TimeUnit;
 @WebSocket(maxTextMessageSize = 64 * 1024)
 public class SocketHandler {
 
-    private final CountDownLatch closeLatch;
+    private static SocketHandler instance;
+    private String destUri;
+    private WebSocketClient client;
+    private LoginCredential credential;
 
-    String destUri;
-
-    public SocketHandler(String uri) {
+    private SocketHandler(String uri) {
         this.destUri = "ws://echo.websocket.org";
-        this.closeLatch = new CountDownLatch(1);
-
     }
 
-    public WebSocketClient open() throws Exception {
-        Notifier notifier = Notifier.INSTANCE;
-        WebSocketClient client = new WebSocketClient();
+    public WebSocketClient open(LoginCredential credential) throws Exception {
+        this.credential = credential;
+        this.client = new WebSocketClient();
+
         URI echoUri = new URI(destUri);
         ClientUpgradeRequest request = new ClientUpgradeRequest();
-        client.start();
-        client.connect(this, echoUri, request);
+
+        this.client.start();
+        this.client.connect(this, echoUri, request);
 
         Platform.runLater(() ->
-                notifier.notifySuccess("Connection successfull", "connected to " + echoUri)
+                        Notifier.INSTANCE.notifySuccess("Connection successfull", "connected to " + echoUri)
         );
         return client;
     }
 
-    public boolean awaitClose(int duration, TimeUnit unit) throws InterruptedException {
-        return this.closeLatch.await(duration, unit);
+    public void close() throws Exception {
+        this.client.stop();
     }
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.printf("Connection closed: %d - %s%n", statusCode, reason);
-        this.closeLatch.countDown();
 
         Platform.runLater(() ->
-                Notifier.INSTANCE.notifyInfo("Connection closed", statusCode + " | " + reason)
+                        Notifier.INSTANCE.notifyWarning("Connection closed", statusCode + " | " + reason)
         );
-
     }
 
     @OnWebSocketConnect
@@ -68,11 +66,10 @@ public class SocketHandler {
         System.out.printf("Got connect: %s%n", session);
         try {
             Future<Void> fut;
-            fut = session.getRemote().sendStringByFuture("Hello");
-            fut.get(2, TimeUnit.SECONDS);
+            fut = session.getRemote().sendStringByFuture(credential.getJSON());
+            fut.get(1, TimeUnit.SECONDS);
             fut = session.getRemote().sendStringByFuture("Thanks for the conversation.");
             fut.get(2, TimeUnit.SECONDS);
-            session.close(StatusCode.NORMAL, "I'm done");
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -81,10 +78,17 @@ public class SocketHandler {
     @OnWebSocketMessage
     public void onMessage(String msg) {
         Platform.runLater(() ->
-            Notifier.INSTANCE.notifyInfo("New message", msg)
+                        Notifier.INSTANCE.notifyInfo("New message", msg)
         );
 
 
         System.out.printf("Got msg: %s%n", msg);
+    }
+
+    public static SocketHandler getInstance(String uri) {
+        if (instance == null) {
+            instance = new SocketHandler(uri);
+        }
+        return instance;
     }
 }

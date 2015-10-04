@@ -1,6 +1,7 @@
 package com.github.fsamin.wsdn.ui.login;
 
 
+import com.github.fsamin.wsdn.handler.SocketHandler;
 import com.github.fsamin.wsdn.ui.MainViewController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +34,11 @@ public class LoginManager {
      * Will show the login application screen.
      */
     public void logout() {
+        try {
+            SocketHandler.getInstance("").close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         showLoginScreen();
     }
 

@@ -36,21 +36,6 @@ public class Main extends Application {
 
         TrayIcon.createTrayIcon(primaryStage);
         Platform.setImplicitExit(false);
-
-        WebSocketClient client = null;
-        try {
-            SocketHandler socket = new SocketHandler("");
-            client = socket.open();
-            socket.awaitClose(60, TimeUnit.SECONDS);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        } finally {
-            try {
-                client.stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }
