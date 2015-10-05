@@ -246,14 +246,14 @@ public enum Notifier {
      * @param NOTIFICATION
      */
     private void showPopup(final Notification NOTIFICATION) {
-        Label title = new Label(NOTIFICATION.TITLE);
+        Label title = new Label(NOTIFICATION.title);
         title.getStyleClass().add("title");
 
-        ImageView icon = new ImageView(NOTIFICATION.IMAGE);
+        ImageView icon = new ImageView(NOTIFICATION.image);
         icon.setFitWidth(ICON_WIDTH);
         icon.setFitHeight(ICON_HEIGHT);
 
-        Label message = new Label(NOTIFICATION.MESSAGE, icon);
+        Label message = new Label(NOTIFICATION.message, icon);
         message.getStyleClass().add("message");
 
         VBox popupLayout = new VBox();

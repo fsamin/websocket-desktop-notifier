@@ -1,10 +1,10 @@
-package com.github.fsamin.wsdn.handler;
+package com.github.fsamin.wsdn.socket;
 
+import com.github.fsamin.wsdn.command.CommandType;
 import com.github.fsamin.wsdn.ui.Notifier;
 import com.github.fsamin.wsdn.ui.login.LoginCredential;
 import javafx.application.Platform;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -13,7 +13,6 @@ import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.net.URI;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -65,9 +64,11 @@ public class SocketHandler {
     public void onConnect(Session session) {
         System.out.printf("Got connect: %s%n", session);
         try {
+
+            SocketCommand cmd = new SocketCommand(CommandType.LOGIN, credential);
+            cmd.send(session);
+
             Future<Void> fut;
-            fut = session.getRemote().sendStringByFuture(credential.getJSON());
-            fut.get(1, TimeUnit.SECONDS);
             fut = session.getRemote().sendStringByFuture("Thanks for the conversation.");
             fut.get(2, TimeUnit.SECONDS);
         } catch (Throwable t) {
@@ -77,10 +78,9 @@ public class SocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(String msg) {
-        Platform.runLater(() ->
-                        Notifier.INSTANCE.notifyInfo("New message", msg)
-        );
 
+        SocketCommand cmd = SocketCommand.fromJSON(msg);
+        Platform.runLater(() -> SocketController.process(cmd));
 
         System.out.printf("Got msg: %s%n", msg);
     }

@@ -1,7 +1,7 @@
 package com.github.fsamin.wsdn.ui.login;
 
 
-import com.github.fsamin.wsdn.handler.SocketHandler;
+import com.github.fsamin.wsdn.socket.SocketHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;

@@ -8,12 +8,11 @@ public class Notification {
     public static final Image WARNING_ICON = new Image(Notifier.class.getResourceAsStream("/warning.png"));
     public static final Image SUCCESS_ICON = new Image(Notifier.class.getResourceAsStream("/success.png"));
     public static final Image ERROR_ICON = new Image(Notifier.class.getResourceAsStream("/error.png"));
-    public final String TITLE;
-    public final String MESSAGE;
-    public final Image IMAGE;
 
+    public final String title;
+    public final String message;
+    public final Image image;
 
-    // ******************** Constructors **************************************
     public Notification(final String TITLE, final String MESSAGE) {
         this(TITLE, MESSAGE, null);
     }
@@ -23,9 +22,9 @@ public class Notification {
     }
 
     public Notification(final String TITLE, final String MESSAGE, final Image IMAGE) {
-        this.TITLE = TITLE;
-        this.MESSAGE = MESSAGE;
-        this.IMAGE = IMAGE;
+        this.title = TITLE;
+        this.message = MESSAGE;
+        this.image = IMAGE;
     }
 
 

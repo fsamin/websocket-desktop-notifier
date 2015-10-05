@@ -40,9 +40,4 @@ public class LoginCredential {
         this.password = password;
     }
 
-    public String getJSON() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
 }
