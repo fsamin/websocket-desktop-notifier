@@ -41,7 +41,7 @@ public class LoginController {
      */
     private String authorize() {
         try {
-            SocketHandler.getInstance("").open(new LoginCredential(domain.getText(), user.getText(), password.getText()));
+            SocketHandler.getInstance("ws://localhost:8001").open(new LoginCredential(domain.getText(), user.getText(), password.getText()));
         } catch (Exception e) {
             e.printStackTrace();
         }

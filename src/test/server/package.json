@@ -13,6 +13,8 @@
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-nodemon": "^2.0.4"
+    "gulp-nodemon": "^2.0.4",
+    "mockaroo": "^0.1.6",
+    "sleep": "^3.0.0"
   }
 }

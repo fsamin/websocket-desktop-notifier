@@ -1,5 +1,6 @@
 package com.github.fsamin.wsdn.socket;
 
+import com.github.fsamin.wsdn.Notification;
 import com.github.fsamin.wsdn.command.CommandResult;
 import com.github.fsamin.wsdn.ui.Notifier;
 
@@ -23,7 +24,7 @@ public class SocketController {
     }
 
     public static void loginSuccess(SocketCommand cmd) {
-
+        Notifier.INSTANCE.notifyInfo("Authentication", "You are successfully connection to server");
     }
 
     public static void loginFailure(SocketCommand cmd) {
@@ -31,7 +32,8 @@ public class SocketController {
     }
 
     public static void notification(SocketCommand cmd) {
-        Notifier.INSTANCE.notifyInfo("New message", cmd.getData().toString());
+        Notification n = Notification.fromJSON(cmd.getData());
+        Notifier.INSTANCE.notify(n);
     }
 
 }

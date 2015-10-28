@@ -2,11 +2,16 @@ package com.github.fsamin.wsdn.socket;
 
 import com.github.fsamin.wsdn.command.CommandResult;
 import com.github.fsamin.wsdn.command.CommandType;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -28,16 +33,23 @@ public class SocketCommand {
         return result;
     }
 
-    public Object getData() {
+    public JsonObject getData() {
         return data;
     }
 
     private CommandResult result;
-    private Object data;
+    private JsonObject data;
+
+    public SocketCommand(){}
+
+    public SocketCommand(CommandType type, JsonObject data) {
+        this.type = type;
+        this.data = data;
+    }
 
     public SocketCommand(CommandType type, Object data) {
         this.type = type;
-        this.data = data;
+        this.data = new Gson().toJsonTree(data).getAsJsonObject();
     }
 
     public String getJSON() {
@@ -58,8 +70,24 @@ public class SocketCommand {
     }
 
     public static SocketCommand fromJSON(String json) {
-        Gson gson = new Gson();
-        SocketCommand cmd = gson.fromJson(json, SocketCommand.class);
-        return cmd;
+        JsonParser parser = new JsonParser();
+        InputStream is = new ByteArrayInputStream(json.getBytes());
+        InputStreamReader isr = new InputStreamReader(is);
+        JsonReader reader = new JsonReader(isr);
+        reader.setLenient(true);
+        JsonObject object = parser.parse(reader).getAsJsonObject();
+
+        SocketCommand cmd = new SocketCommand();
+
+        try {
+            cmd.type = CommandType.get(object.get("type").getAsString());
+            cmd.data = object.getAsJsonObject("data");
+            cmd.result = CommandResult.get(object.get("result").getAsString());
+
+            return cmd;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

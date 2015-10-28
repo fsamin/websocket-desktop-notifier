@@ -28,7 +28,11 @@ public class SocketHandler {
     private LoginCredential credential;
 
     private SocketHandler(String uri) {
-        this.destUri = "ws://echo.websocket.org";
+        if (uri == null) {
+            this.destUri = "ws://echo.websocket.org";
+        } else {
+            this.destUri = uri;
+        }
     }
 
     public WebSocketClient open(LoginCredential credential) throws Exception {
@@ -68,9 +72,6 @@ public class SocketHandler {
             SocketCommand cmd = new SocketCommand(CommandType.LOGIN, credential);
             cmd.send(session);
 
-            Future<Void> fut;
-            fut = session.getRemote().sendStringByFuture("Thanks for the conversation.");
-            fut.get(2, TimeUnit.SECONDS);
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -78,9 +79,10 @@ public class SocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(String msg) {
-
         SocketCommand cmd = SocketCommand.fromJSON(msg);
-        Platform.runLater(() -> SocketController.process(cmd));
+        if (cmd != null) {
+            Platform.runLater(() -> SocketController.process(cmd));
+        }
 
         System.out.printf("Got msg: %s%n", msg);
     }

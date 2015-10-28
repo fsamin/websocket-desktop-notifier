@@ -29,3 +29,6 @@ jar {
     }
 }
 
+task testIT(dependsOn:'run') {
+
+}
